@@ -39,10 +39,10 @@ void init(){
 
     // Set up interrupts, ports and pull-ups 
 
-    // INT0
+    // INT0 HALL
     DDRD &= ~(1 << PD2);
 
-    // INT1
+    // INT1 BUTTON
     DDRD &= ~(1 << PD3);
     PORTD |= (1 << PD3);
 
@@ -59,6 +59,12 @@ void init(){
     TCCR1B = (1 << WGM12) | (1 << CS12); // Set prescaler to 256
     OCR1A = 62500; // Set compare value for 1 second
     TIMSK1 |= (1 << OCIE1A); // Enable Timer1 compare interrupt
+
+    // set up timer 16ms interrupt
+    TCCR0A = 0; // Set Timer0 to normal mode
+    TCCR0B = (1 << WGM02) | (1 << CS02) | (1 << CS00); // Set prescaler to 1024
+    OCR0A = 255; // Set compare value for 16ms seconds
+    TIMSK0 |= (1 << OCIE0A); // Enable Timer0 compare interrupt
 
     // PORTC(0,1) as input
     DDRC &= ~(1 << PC0);
@@ -86,7 +92,7 @@ void LCD_Write(uint8_t line, char text1[16], char text2[16]=" ", float number = 
     char n2s[16];
     itoa(number, n2s, 10);
     LCD_WriteText(n2s);
-    uint8_t number_dec = number * 10 - (uint8_t)number * 10; // Conwert number to string
+    uint8_t number_dec = number * 10 - (uint8_t)number * 10; // Convert number to string
     if (number_dec != 0){
         itoa(number_dec, n2s, 10);
         LCD_WriteText(",");
@@ -111,11 +117,11 @@ void menu(){
                 save_distance(distance);
                 LCD_Write(1, "< Res ODO: ", "km ", distance / (100*1000.0));
         }
-        else if ((PINC & (1 << PC1)) == 0){ // if PINC1 is 0 increment radius by 10 (range 10 - 150 [cm])
+        else if ((PINC & (1 << PC1)) == 0){ // if PINC1 is 0 increment radius by 10 (range 10 - 40 [cm])
             _delay_ms(200);
             while ((PINC & (1 << PC1)) == 0);
-                radius += 10;
-                if (radius >= 160){
+                radius += 1;
+                if (radius > 40){
                     radius = 10;
                 }
                 save_radius(radius);
