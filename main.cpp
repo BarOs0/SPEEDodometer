@@ -19,10 +19,12 @@ AGH University of Krakow
 #include "modules/HD44780.c"
 
 // Set up the microcontroller global variables
-uint8_t counter = 0; 
+uint8_t counter = 0; // Counter for the number of pulses from the Hall sensor
+uint8_t display_counter = 0; // Counter for the number of interrupts for the LCD display update
 uint8_t speed = 0; // [m/s]
+float speed_tab[5] = {0,0,0,0,0}; // [m/s]
 uint32_t distance = 0; // [cm]
-uint8_t radius = 100; // default [cm]
+uint8_t radius = 10; // default [cm]
 const float pi = 3.14159; 
 
 // Our own libraries
